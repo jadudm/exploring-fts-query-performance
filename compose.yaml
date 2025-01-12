@@ -1,0 +1,30 @@
+services:
+  #-----------------------------------------------------
+  # postgres common
+  #-----------------------------------------------------
+  x-pg-common: &pg-common
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    healthcheck:
+      # test: ["CMD-SHELL", "pg_isready", "-d", "postgres", "-U", "postgres"]
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s  
+
+  #-----------------------------------------------------
+  # postgres/pg :5432
+  #-----------------------------------------------------
+  pg:
+    <<: *pg-common
+    ports:
+      - 5432:5432
+    volumes:
+      - scaling-vol:/var/lib/postgresql/data
+
+volumes:
+  scaling-vol:
